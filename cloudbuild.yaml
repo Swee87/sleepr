@@ -1,0 +1,46 @@
+steps:
+  - id: 'build-auth'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-east4-docker.pkg.dev/coop-457500/auth/production', '-f', 'apps/auth/Dockerfile', '.']
+    waitFor: ['-']
+
+  - id: 'push-auth'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-east4-docker.pkg.dev/coop-457500/auth/production']
+    waitFor: ['build-auth']
+
+  - id: 'build-notifications'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-east4-docker.pkg.dev/coop-457500/notifications/production', '-f', 'apps/notifications/Dockerfile', '.']
+    waitFor: ['-']
+
+  - id: 'push-notifications'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-east4-docker.pkg.dev/coop-457500/notifications/production']
+    waitFor: ['build-notifications']
+
+  - id: 'build-payments'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-east4-docker.pkg.dev/coop-457500/payment/production', '-f', 'apps/payments/Dockerfile', '.']
+    waitFor: ['-']
+
+  - id: 'push-payments'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-east4-docker.pkg.dev/coop-457500/payment/production']
+    waitFor: ['build-payments']
+
+  - id: 'build-reservations'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-east4-docker.pkg.dev/coop-457500/reservations/production', '-f', 'apps/reservations/Dockerfile', '.']
+    waitFor: ['-']
+
+  - id: 'push-reservations'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-east4-docker.pkg.dev/coop-457500/reservations/production']
+    waitFor: ['build-reservations']
+
+images:
+  - 'us-east4-docker.pkg.dev/coop-457500/auth/production'
+  - 'us-east4-docker.pkg.dev/coop-457500/notifications/production'
+  - 'us-east4-docker.pkg.dev/coop-457500/payment/production'
+  - 'us-east4-docker.pkg.dev/coop-457500/reservations/production'

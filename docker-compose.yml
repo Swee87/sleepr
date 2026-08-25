@@ -1,0 +1,109 @@
+services:
+  reservations:
+    build:
+      context: .
+      dockerfile: './apps/reservations/Dockerfile'
+      target: development
+    command: node dist/apps/reservations/main.js
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/dist
+    env_file:
+      - ./apps/reservations/.env
+    depends_on:
+      - auth
+      - payments
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: node dist/apps/auth/main.js
+    ports:
+      - "3001:3001"
+      - "3002:3002"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/dist
+    env_file:
+      - ./apps/auth/.env
+
+  payments:
+    build:
+      context: .
+      dockerfile: ./apps/payments/Dockerfile
+      target: development
+    command: node dist/apps/payments/main.js
+    ports:
+      - "3003:3003"
+      - "3004:3004"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/dist
+    env_file:
+      - ./apps/payments/.env
+
+  notifications:
+    build:
+      context: .
+      dockerfile: ./apps/notifications/Dockerfile
+      target: development
+    command: node dist/apps/notifications/main.js
+    ports:
+      - "3005:3005"
+      - "3006:3006"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/dist
+    env_file:
+      - ./apps/notifications/.env
+
+# services:
+#   reservations:
+#     build:
+#       context: .
+#       dockerfile: './apps/reservations/Dockerfile'
+#       target: development
+#     command: npm run start:dev reservations
+#     ports:
+#       - "3000:3000"
+#     volumes:
+#       - .:/usr/src/app
+#       - /usr/src/app/node_modules # prevents local node_modules from overwriting container's
+#     env_file:
+#       - ./apps/reservations/.env
+#   auth:
+#     build:
+#       context: .
+#       dockerfile: ./apps/auth/Dockerfile
+#       target: development
+#     command: npm run start:dev auth
+#     ports:
+#       - "3001:3001"
+#       - "3002:3002"
+#     volumes:
+#       - .:/usr/src/app
+#       - /usr/src/app/node_modules # prevents local node_modules from overwriting container's
+#     env_file:
+#       - ./apps/auth/.env
+#   payments:
+#     build:
+#       context: .
+#       dockerfile: ./apps/payments/Dockerfile
+#       target: development
+#     command: npm run start:dev payments
+#     ports:
+#       - "3003:3003"
+#       - "3004:3004"
+#     volumes:
+#       - .:/usr/src/app
+#       - /usr/src/app/node_modules # prevents local node_modules from overwriting container's
+#     env_file:
+#       - ./apps/payments/.env
