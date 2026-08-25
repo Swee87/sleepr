@@ -44,3 +44,6 @@ images:
   - 'us-east4-docker.pkg.dev/coop-457500/notifications/production'
   - 'us-east4-docker.pkg.dev/coop-457500/payment/production'
   - 'us-east4-docker.pkg.dev/coop-457500/reservations/production'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
