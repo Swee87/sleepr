@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: reservations
+  name: reservations
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reservations
+  template:
+    metadata:
+      labels:
+        app: reservations
+    spec:
+      containers:
+        - image: {{ .Values.reservations.image }}
+          name: reservations
+          ports:
+            - containerPort: {{ .Values.reservations.port }}
+          env:
+            - name: PORT
+              value: {{ .Values.reservations.port | quote }}
+            - name: RABBITMQ_URI
+              value: {{ .Values.rabbitmq.uri | quote }}
+          envFrom:
+            - secretRef:
+                name: reservations-secrets
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.reservations.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10

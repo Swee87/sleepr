@@ -5,9 +5,10 @@ import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 import { ValidationPipe } from '@nestjs/common';
 import { json } from 'express';
+import { PAYMENTS_SERVICE } from '@app/common';
 
 async function bootstrap() {
-  // Creates a hybrid app (HTTP + TCP microservice)
+  // Creates a hybrid app (HTTP + RabbitMQ microservice)
   const app = await NestFactory.create(PaymentsModule);
   const configService = app.get(ConfigService);
 
@@ -23,12 +24,13 @@ async function bootstrap() {
     }),
   );
 
-  // ─── TCP Microservice (for inter-service communication) ───────
+  // ─── RabbitMQ Microservice (for inter-service communication) ──
   app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.TCP,
+    transport: Transport.RMQ,
     options: {
-      host: '0.0.0.0',
-      port: configService.get<number>('TCP_PORT'), // separate port for TCP
+      urls: [configService.getOrThrow<string>('RABBITMQ_URI')],
+      queue: PAYMENTS_SERVICE,
+      queueOptions: { durable: true },
     },
   });
 
@@ -44,16 +46,15 @@ async function bootstrap() {
   // ─── Logger ───────────────────────────────────────────────────
   app.useLogger(app.get(Logger));
 
-  // ─── Start both HTTP and TCP ──────────────────────────────────
+  // ─── Start both HTTP and RabbitMQ consumer ────────────────────
   await app.startAllMicroservices();
-  
+
   const port = configService.get<number>('PORT') || 3003;
-  const tcpPort = configService.get<number>('TCP_PORT');
-  
+
   await app.listen(port); // HTTP for webhook
 
   console.log(`Payments HTTP running on port ${port}`);
-  console.log(`Payments TCP running on port ${tcpPort}`);
+  console.log(`Payments consuming RabbitMQ queue "${PAYMENTS_SERVICE}"`);
 }
 bootstrap();
 

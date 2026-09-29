@@ -12,7 +12,7 @@ import * as Joi from 'joi';
       isGlobal: true,
       validationSchema: Joi.object({
         PORT: Joi.number().required(),
-        TCP_PORT: Joi.number().required(),
+        RABBITMQ_URI: Joi.string().required(),
         SMTP_USER: Joi.string().required(),
         BREVO_API_KEY: Joi.string().required(),
       }),

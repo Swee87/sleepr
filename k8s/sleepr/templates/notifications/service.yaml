@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: notifications
+  name: notifications
+spec:
+  type: {{ .Values.notifications.serviceType }}
+  selector:
+    app: notifications
+  ports:
+    - name: http
+      port: {{ .Values.notifications.port }}
+      targetPort: {{ .Values.notifications.port }}

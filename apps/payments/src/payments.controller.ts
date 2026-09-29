@@ -18,9 +18,10 @@ import { RefundPaymentDto } from './dto/refund-payment.dto';
 import { WebhookSignatureGuard } from './guards/webhook-signature.guard';
 import { PAYMENT_QUEUE, PaymentJob } from './queues/payment.queue';
 
-// ─── TCP Message Patterns ─────────────────────────────────────
-// No @Controller prefix for TCP routes
-@Controller()
+// ─── RabbitMQ Message Patterns + HTTP routes ──────────────────
+// The 'payments' prefix only affects HTTP routes (message patterns ignore it) and
+// must match the raw-body parser in main.ts and PaymentSecurityMiddleware.
+@Controller('payments')
 export class PaymentsController {
   constructor(
     private readonly paymentsService: PaymentsService,

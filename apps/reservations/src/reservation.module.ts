@@ -26,10 +26,7 @@ import { ConfigService } from '@nestjs/config';
       validationSchema: Joi.object({
         MONGODB_URI: Joi.string().required(),
         PORT: Joi.number().required(),
-        AUTH_HOST: Joi.string().required(),
-        AUTH_PORT: Joi.number().required(),
-        PAYMENT_HOST: Joi.string().required(),
-        PAYMENT_PORT: Joi.number().required(),
+        RABBITMQ_URI: Joi.string().required(),
         // JWT_SECRET: Joi.string().required(),
         // JWT_EXPIRES_IN: Joi.number().required(),
       })
@@ -38,11 +35,11 @@ import { ConfigService } from '@nestjs/config';
       {
         name: AUTH_SERVICE,
         useFactory: (configService: ConfigService) => ({
-          transport: Transport.TCP,
+          transport: Transport.RMQ,
           options: {
-            host: configService.get<string>('AUTH_HOST'),
-            port: configService.getOrThrow<number>('AUTH_PORT'),
-
+            urls: [configService.getOrThrow<string>('RABBITMQ_URI')],
+            queue: AUTH_SERVICE,
+            queueOptions: { durable: true },
           },
         }),
         inject: [ConfigService],
@@ -50,11 +47,11 @@ import { ConfigService } from '@nestjs/config';
       {
         name: PAYMENTS_SERVICE,
         useFactory: (configService: ConfigService) => ({
-          transport: Transport.TCP,
+          transport: Transport.RMQ,
           options: {
-            host: configService.get<string>('PAYMENT_HOST'),
-            port: configService.getOrThrow<number>('PAYMENT_PORT'),
-
+            urls: [configService.getOrThrow<string>('RABBITMQ_URI')],
+            queue: PAYMENTS_SERVICE,
+            queueOptions: { durable: true },
           },
         }),
         inject: [ConfigService],

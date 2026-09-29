@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: notifications
+  name: notifications
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notifications
+  template:
+    metadata:
+      labels:
+        app: notifications
+    spec:
+      containers:
+        - image: {{ .Values.notifications.image }}
+          name: notifications
+          ports:
+            - containerPort: {{ .Values.notifications.port }}
+          env:
+            - name: PORT
+              value: {{ .Values.notifications.port | quote }}
+            - name: RABBITMQ_URI
+              value: {{ .Values.rabbitmq.uri | quote }}
+          envFrom:
+            - secretRef:
+                name: notifications-secrets
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.notifications.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10

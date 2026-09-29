@@ -1,0 +1,37 @@
+rabbitmq:
+  uri: amqp://rabbitmq:5672
+
+# Secrets are NOT stored here — each service reads them from a Kubernetes
+# Secret named "<service>-secrets", created by k8s/create-secrets.ps1.
+
+reservations:
+  image: us-east4-docker.pkg.dev/coop-457500/reservations/production
+  port: 3000
+  serviceType: ClusterIP
+
+auth:
+  image: us-east4-docker.pkg.dev/coop-457500/auth/production
+  port: 3001
+  serviceType: ClusterIP
+
+payments:
+  # Artifact Registry repo is "payment" (singular)
+  image: us-east4-docker.pkg.dev/coop-457500/payment/production
+  port: 3003
+  serviceType: ClusterIP
+
+notifications:
+  image: us-east4-docker.pkg.dev/coop-457500/notifications/production
+  port: 3005
+  serviceType: ClusterIP
+
+ingress:
+  enabled: true
+  # GKE's built-in controller: one Google Cloud HTTP(S) load balancer for all services
+  className: gce
+  # Optional: name of a reserved global static IP
+  #   gcloud compute addresses create sleepr-ip --global
+  staticIpName: ""
+  # Optional: a domain you control, pointed (A record) at the Ingress IP.
+  # When set, a Google-managed HTTPS certificate is provisioned for it.
+  domain: ""

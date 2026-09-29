@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: payments
+  name: payments
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments
+  template:
+    metadata:
+      labels:
+        app: payments
+    spec:
+      containers:
+        - image: {{ .Values.payments.image }}
+          name: payments
+          ports:
+            - containerPort: {{ .Values.payments.port }}
+          env:
+            - name: PORT
+              value: {{ .Values.payments.port | quote }}
+            - name: RABBITMQ_URI
+              value: {{ .Values.rabbitmq.uri | quote }}
+          envFrom:
+            - secretRef:
+                name: payments-secrets
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.payments.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10

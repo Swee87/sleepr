@@ -1,0 +1,52 @@
+{{- if .Values.ingress.enabled }}
+# GKE Ingress has no path rewriting, so each path must match the app's real route.
+# payments' dev-only routes (verify, queue/status) are deliberately not exposed —
+# only the Paystack webhook is public.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sleepr
+  annotations:
+    {{- if .Values.ingress.staticIpName }}
+    kubernetes.io/ingress.global-static-ip-name: {{ .Values.ingress.staticIpName | quote }}
+    {{- end }}
+    {{- if .Values.ingress.domain }}
+    networking.gke.io/managed-certificates: sleepr-cert
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - {{- if .Values.ingress.domain }}
+      host: {{ .Values.ingress.domain | quote }}
+      {{- end }}
+      http:
+        paths:
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth
+                port:
+                  number: {{ .Values.auth.port }}
+          - path: /users
+            pathType: Prefix
+            backend:
+              service:
+                name: auth
+                port:
+                  number: {{ .Values.auth.port }}
+          - path: /reservation
+            pathType: Prefix
+            backend:
+              service:
+                name: reservations
+                port:
+                  number: {{ .Values.reservations.port }}
+          - path: /payments/webhook
+            pathType: Exact
+            backend:
+              service:
+                name: payments
+                port:
+                  number: {{ .Values.payments.port }}
+{{- end }}

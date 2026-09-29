@@ -1,0 +1,9 @@
+{{- if and .Values.ingress.enabled .Values.ingress.domain }}
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: sleepr-cert
+spec:
+  domains:
+    - {{ .Values.ingress.domain | quote }}
+{{- end }}

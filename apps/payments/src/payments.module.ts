@@ -25,15 +25,13 @@ import { NOTIFICATIONS_SERVICE } from '@app/common';
       envFilePath: './apps/payments/.env',
       validationSchema: Joi.object({
         PORT: Joi.number().required(),
-        TCP_PORT: Joi.number().required(),
+        RABBITMQ_URI: Joi.string().required(),
         MONGODB_URI: Joi.string().required(),
         PAYSTACK_SECRETKEY: Joi.string().required(),
         REDIS_HOST: Joi.string().required(),
         REDIS_PORT: Joi.number().required(),
         REDIS_PASSWORD: Joi.string().optional(),
         REDIS_TLS: Joi.string().optional(),
-        NOTIFICATIONS_HOST: Joi.string().required(),
-        NOTIFICATIONS_PORT: Joi.number().required()
       }),
     }),
     MongooseModule.forRootAsync({
@@ -75,10 +73,11 @@ import { NOTIFICATIONS_SERVICE } from '@app/common';
       {
         name: NOTIFICATIONS_SERVICE,
         useFactory: (configService: ConfigService) => ({
-          transport: Transport.TCP,
+          transport: Transport.RMQ,
           options: {
-            host: configService.get<string>('NOTIFICATIONS_HOST'),
-            port: configService.get<number>('NOTIFICATIONS_PORT'),
+            urls: [configService.getOrThrow<string>('RABBITMQ_URI')],
+            queue: NOTIFICATIONS_SERVICE,
+            queueOptions: { durable: true },
           },
         }),
         inject: [ConfigService],

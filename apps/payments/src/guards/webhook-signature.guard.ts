@@ -19,7 +19,7 @@ export class WebhookSignatureGuard implements CanActivate {
             throw new UnauthorizedException('Missing webhook signature');
         }
 
-        const secret = this.configService.get<string>('PAYSTACK_SECRET_KEY');
+        const secret = this.configService.get<string>('PAYSTACK_SECRETKEY');
 
         if (!secret) {
             throw new UnauthorizedException('Missing webhook secret configuration');

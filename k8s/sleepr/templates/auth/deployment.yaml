@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: auth
+  name: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - image: {{ .Values.auth.image }}
+          name: auth
+          ports:
+            - containerPort: {{ .Values.auth.port }}
+          env:
+            - name: HTTP_PORT
+              value: {{ .Values.auth.port | quote }}
+            - name: RABBITMQ_URI
+              value: {{ .Values.rabbitmq.uri | quote }}
+          envFrom:
+            - secretRef:
+                name: auth-secrets
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.auth.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10

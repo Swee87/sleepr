@@ -14,6 +14,7 @@ services:
     env_file:
       - ./apps/reservations/.env
     depends_on:
+      - rabbitmq
       - auth
       - payments
 
@@ -25,13 +26,14 @@ services:
     command: node dist/apps/auth/main.js
     ports:
       - "3001:3001"
-      - "3002:3002"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
       - /usr/src/app/dist
     env_file:
       - ./apps/auth/.env
+    depends_on:
+      - rabbitmq
 
   payments:
     build:
@@ -41,13 +43,14 @@ services:
     command: node dist/apps/payments/main.js
     ports:
       - "3003:3003"
-      - "3004:3004"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
       - /usr/src/app/dist
     env_file:
       - ./apps/payments/.env
+    depends_on:
+      - rabbitmq
 
   notifications:
     build:
@@ -57,13 +60,20 @@ services:
     command: node dist/apps/notifications/main.js
     ports:
       - "3005:3005"
-      - "3006:3006"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
       - /usr/src/app/dist
     env_file:
       - ./apps/notifications/.env
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # management UI (guest/guest)
 
 # services:
 #   reservations:

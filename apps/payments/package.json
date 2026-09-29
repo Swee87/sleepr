@@ -12,6 +12,8 @@
     "@nestjs/microservices": "^11.1.17",
     "@nestjs/mongoose": "^11.0.4",
     "@nestjs/platform-express": "^11.0.1",
+    "amqp-connection-manager": "^5.0.0",
+    "amqplib": "^2.2.0",
     "axios": "^1.13.6",
     "bullmq": "^5.71.1",
     "class-transformer": "^0.5.1",
